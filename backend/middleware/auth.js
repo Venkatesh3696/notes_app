@@ -1,7 +1,6 @@
-import { verify } from "jsonwebtoken";
-import { jwtSecret } from "../config"; // Import configuration file (containing secret key)
+import jwt from "jsonwebtoken";
 
-const verifyToken = (req, res, next) => {
+export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
 
@@ -10,12 +9,11 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    const decoded = verify(token, jwtSecret);
-    req.userId = decoded.userId; // Attach decoded user ID to the request object
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.userId;
+    console.log(decoded);
     next();
   } catch (err) {
     res.status(403).json({ message: "Forbidden: Invalid token" });
   }
 };
-
-export default { verifyToken };
